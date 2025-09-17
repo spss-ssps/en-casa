@@ -1,0 +1,73 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #000000;
+}
+
+#familia {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -45%);
+    width: 100vw;
+    height: auto;
+    display: block;
+    z-index: 10;
+    /* block-size: fit-content; */
+    pointer-events: none;
+
+}
+
+
+
+#anue {
+    position: fixed;
+    top: 0vh;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100vw;
+    height: 55vh;
+    display: block;
+    z-index: 1;
+    opacity: 0.6;
+    transition: opacity 0.5s ease-in-out;
+}
+
+
+
+#boda {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100vw;
+    height: 50vh;
+    display: block;
+    z-index: -1;
+    opacity: 0.6;
+    transition: opacity 0.5s ease-in-out;
+}
+
+#anue:hover,
+#boda:hover {
+    opacity: 1;
+}
+
+#pan {
+    position: fixed;
+    bottom: 2vh;
+    left: 40vw;
+    width: 14vw;
+    height: auto;
+    z-index: 5;
+}
+
+
+#tea {
+    position: fixed;
+    bottom: 20vh;
+    left: 55vw;
+    width: 8vw;
+    height: auto;
+    z-index: 5;
+}
