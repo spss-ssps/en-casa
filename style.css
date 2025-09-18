@@ -26,7 +26,7 @@ body {
     left: 50%;
     transform: translateX(-50%);
     width: 100vw;
-    height: 55vh;
+    height: 56vh;
     display: block;
     z-index: 1;
     opacity: 0.6;
@@ -59,7 +59,14 @@ body {
     left: 40vw;
     width: 14vw;
     height: auto;
-    z-index: 5;
+    z-index: 12;
+    transition: transform 0.3s ease-in-out;
+}
+
+#pan:hover,
+#tea:hover {
+    transform: scale(1.05);
+    cursor: pointer;
 }
 
 
@@ -69,5 +76,6 @@ body {
     left: 55vw;
     width: 8vw;
     height: auto;
-    z-index: 5;
+    z-index: 12;
+    transition: transform 0.3s ease-in-out;
 }
