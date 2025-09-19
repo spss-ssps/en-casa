@@ -1,29 +1,34 @@
 // This script enables audio playback on hover for the #anue image
 window.addEventListener('DOMContentLoaded', function () {
-    const anueImg = document.getElementById('anue');
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const audio = new Audio('src/anueAudio_01.mp3');
-    audio.loop = true;
-    audio.preload = 'auto';
-    audio.crossOrigin = 'anonymous';
-    const track = audioCtx.createMediaElementSource(audio);
-    const gainNode = audioCtx.createGain();
-    gainNode.gain.value = 0;
-    track.connect(gainNode).connect(audioCtx.destination);
-    audio.play();
+    function addHoverFadeAudio(imgId, audioSrc, fadeDuration = 0.5) {
+        const img = document.getElementById(imgId);
+        if (!img) return;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const audio = new Audio(audioSrc);
+        audio.loop = true;
+        audio.preload = 'auto';
+        audio.crossOrigin = 'anonymous';
+        const track = audioCtx.createMediaElementSource(audio);
+        const gainNode = audioCtx.createGain();
+        gainNode.gain.value = 0;
+        track.connect(gainNode).connect(audioCtx.destination);
+        audio.play();
 
-    function fadeGain(target, duration = 0.5) {
-        const now = audioCtx.currentTime;
-        gainNode.gain.cancelScheduledValues(now);
-        gainNode.gain.setValueAtTime(gainNode.gain.value, now);
-        gainNode.gain.linearRampToValueAtTime(target, now + duration);
+        function fadeGain(target) {
+            const now = audioCtx.currentTime;
+            gainNode.gain.cancelScheduledValues(now);
+            gainNode.gain.setValueAtTime(gainNode.gain.value, now);
+            gainNode.gain.linearRampToValueAtTime(target, now + fadeDuration);
+        }
+
+        img.addEventListener('mouseenter', function () {
+            fadeGain(1);
+        });
+        img.addEventListener('mouseleave', function () {
+            fadeGain(0);
+        });
     }
 
-    anueImg.addEventListener('mouseenter', function () {
-        fadeGain(1, 0.5);
-    });
-
-    anueImg.addEventListener('mouseleave', function () {
-        fadeGain(0, 0.5);
-    });
+    addHoverFadeAudio('anue', 'src/anueAudio_01.mp3', 0.5);
+    addHoverFadeAudio('boda', 'src/bodaAudio_01.mp3', 0.5);
 });
