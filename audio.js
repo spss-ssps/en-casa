@@ -3,18 +3,26 @@ window.addEventListener('DOMContentLoaded', function () {
     function addHoverFadeAudio(imgId, audioSrc, fadeDuration = 0.5) {
         const img = document.getElementById(imgId);
         if (!img) return;
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const audio = new Audio(audioSrc);
-        audio.loop = true;
-        audio.preload = 'auto';
-        audio.crossOrigin = 'anonymous';
-        const track = audioCtx.createMediaElementSource(audio);
-        const gainNode = audioCtx.createGain();
-        gainNode.gain.value = 0;
-        track.connect(gainNode).connect(audioCtx.destination);
-        audio.play();
+        let audioCtx, audio, track, gainNode;
+        let started = false;
+
+        function startAudio() {
+            if (started) return;
+            started = true;
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            audio = new Audio(audioSrc);
+            audio.loop = true;
+            audio.preload = 'auto';
+            audio.crossOrigin = 'anonymous';
+            track = audioCtx.createMediaElementSource(audio);
+            gainNode = audioCtx.createGain();
+            gainNode.gain.value = 0;
+            track.connect(gainNode).connect(audioCtx.destination);
+            audio.play();
+        }
 
         function fadeGain(target) {
+            if (!started) return;
             const now = audioCtx.currentTime;
             gainNode.gain.cancelScheduledValues(now);
             gainNode.gain.setValueAtTime(gainNode.gain.value, now);
@@ -22,6 +30,7 @@ window.addEventListener('DOMContentLoaded', function () {
         }
 
         img.addEventListener('mouseenter', function () {
+            startAudio();
             fadeGain(1);
         });
         img.addEventListener('mouseleave', function () {
