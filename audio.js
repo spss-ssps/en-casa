@@ -1,40 +1,45 @@
-// This script enables audio playback on hover for the #anue image
 window.addEventListener('DOMContentLoaded', function () {
     function addHoverFadeAudio(imgId, audioSrc, fadeDuration = 0.5) {
         const img = document.getElementById(imgId);
         if (!img) return;
-        let audioCtx, audio, track, gainNode;
-        let started = false;
 
-        function startAudio() {
-            if (started) return;
-            started = true;
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            audio = new Audio(audioSrc);
-            audio.loop = true;
-            audio.preload = 'auto';
-            audio.crossOrigin = 'anonymous';
-            track = audioCtx.createMediaElementSource(audio);
-            gainNode = audioCtx.createGain();
-            gainNode.gain.value = 0;
-            track.connect(gainNode).connect(audioCtx.destination);
-            audio.play();
-        }
+        let audio = null;
+        let fadeInterval;
 
-        function fadeGain(target) {
-            if (!started) return;
-            const now = audioCtx.currentTime;
-            gainNode.gain.cancelScheduledValues(now);
-            gainNode.gain.setValueAtTime(gainNode.gain.value, now);
-            gainNode.gain.linearRampToValueAtTime(target, now + fadeDuration);
+        function fade(targetVolume, stopAfter = false) {
+            clearInterval(fadeInterval);
+            if (!audio) return;
+
+            const step = (targetVolume - audio.volume) / (fadeDuration * 60); // ~60fps
+            fadeInterval = setInterval(() => {
+                let newVol = audio.volume + step;
+                if ((step > 0 && newVol >= targetVolume) || (step < 0 && newVol <= targetVolume)) {
+                    newVol = targetVolume;
+                    clearInterval(fadeInterval);
+                    if (stopAfter && newVol === 0) {
+                        audio.pause();
+                        audio.currentTime = 0; // rewind
+                        audio = null;
+                    }
+                }
+                audio.volume = Math.min(1, Math.max(0, newVol));
+            }, 1000 / 60);
         }
 
         img.addEventListener('mouseenter', function () {
-            startAudio();
-            fadeGain(1);
+            if (!audio) {
+                audio = new Audio(audioSrc);
+                audio.loop = true;
+                audio.volume = 0;
+                audio.play().catch(err => {
+                    console.log("Play blocked until user gesture:", err);
+                });
+            }
+            fade(1);
         });
+
         img.addEventListener('mouseleave', function () {
-            fadeGain(0);
+            fade(0, true); // fade to 0, then stop and clean up
         });
     }
 
