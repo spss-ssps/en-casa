@@ -58,7 +58,7 @@ body {
     left: 50%;
     transform: translateX(-50%);
     width: 100vw;
-    height: 56vh;
+    height: 55vh;
     display: block;
     z-index: 1;
     opacity: 0.6;
@@ -73,7 +73,7 @@ body {
     left: 50%;
     transform: translateX(-50%);
     width: 100vw;
-    height: 50vh;
+    height: 45vh;
     display: block;
     z-index: -1;
     opacity: 0.6;
