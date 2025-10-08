@@ -44,7 +44,7 @@ window.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('touchstart', unlock, true);
     }
 
-    function fadeTo(player, targetVolume, durationMs) {
+    function fadeTo(player, targetVolume, durationMs, pauseAtZero = false) {
         clearInterval(player.fadeInterval);
         const startVol = player.audio.volume;
         const steps = Math.max(1, Math.round((durationMs || 500) / (1000 / 60)));
@@ -57,13 +57,16 @@ window.addEventListener('DOMContentLoaded', () => {
             if (i >= steps) {
                 player.audio.volume = Math.min(1, Math.max(0, targetVolume));
                 clearInterval(player.fadeInterval);
+                if (pauseAtZero && player.audio.volume === 0 && !player.audio.paused) {
+                    try { player.audio.pause(); } catch (_) { }
+                }
             }
         }, 1000 / 60);
     }
 
     function stopOthers(exceptId, durationMs) {
         Object.keys(players).forEach((id) => {
-            if (id !== exceptId) fadeTo(players[id], 0, durationMs);
+            if (id !== exceptId) fadeTo(players[id], 0, durationMs, true);
         });
     }
 
@@ -100,14 +103,15 @@ window.addEventListener('DOMContentLoaded', () => {
 
         if (isTouch) {
             // Mobile/tablet: tap toggles this audio; also fades others out
-            img.addEventListener('click', (e) => {
+            const onToggle = (e) => {
                 e.preventDefault();
                 if (player.audio.volume > 0.05) {
                     deactivate();
                 } else {
                     activate();
                 }
-            });
+            };
+            img.addEventListener('pointerdown', onToggle);
         } else {
             // Desktop: hover in/out
             img.addEventListener('mouseenter', activate);
@@ -118,4 +122,15 @@ window.addEventListener('DOMContentLoaded', () => {
     // Attach to your images
     addInteractiveAudio('anue', 'src/anueAudio_01.mp3', 500);
     addInteractiveAudio('boda', 'src/bodaAudio_01.mp3', 500);
+
+    // Resume active audio after returning to the page (e.g., after app switching)
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            Object.values(players).forEach(p => {
+                if (p.audio.volume > 0 && p.audio.paused) {
+                    p.audio.play().catch(() => { });
+                }
+            });
+        }
+    });
 });
