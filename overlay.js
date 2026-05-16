@@ -1,8 +1,8 @@
 document.getElementById('casa').addEventListener('click', () => {
-    // Hide overlay
     document.getElementById('overlay').style.display = 'none';
 
-    // Unlock audio context (if needed)
-    const silentAudio = new Audio();
-    silentAudio.play().catch(() => { });
-})
+    // Prime iOS audio gate with a real src
+    const primer = new Audio('src/anueAudio_01.mp3');
+    primer.volume = 0.001;
+    primer.play().then(() => primer.pause()).catch(() => { });
+});
